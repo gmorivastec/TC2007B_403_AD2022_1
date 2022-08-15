@@ -1,5 +1,6 @@
 package mx.itesm.clase1
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -9,8 +10,40 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 
 class MainActivity : AppCompatActivity() {
+
+
+    private lateinit var textoEditable : EditText
+
+    val lanzador = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+        Toast.makeText(this, "REGRESANDO DE ACTIVIDAD", Toast.LENGTH_SHORT).show()
+
+        // verificar código y actuar conforme a lo recibido
+        if(result.resultCode == Activity.RESULT_OK){
+
+            val datos = result.data
+
+            // kotlin - safe call (llamada segura)
+            // anula una línea si un objeto de ella es nulo
+            /*
+            if(datos != null) {
+                Toast.makeText(this, datos.getStringExtra("resultadoNombre"), Toast.LENGTH_SHORT)
+                    .show()
+            }*/
+
+            Toast.makeText(this, datos?.getStringExtra("resultadoNombre"), Toast.LENGTH_SHORT)
+                .show()
+
+            Toast.makeText(this, "${datos?.getIntExtra("hora", -1)}", Toast.LENGTH_SHORT)
+                .show()
+
+            // ?: - elvis operator (lo checamos después)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         // prueba de mutabilidad
         // textito = findViewById<TextView>(R.id.textView)
 
-        val textoEditable = findViewById<EditText>(R.id.editTextTextPersonName)
+        textoEditable = findViewById(R.id.editTextTextPersonName)
         val botoncito = findViewById<Button>(R.id.button)
 
         textito.text = "HOLA, SOY CÓDIGO"
@@ -52,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         // IMPORTANTE: en cualquier caso los tipos en Kotlin son RÍGIDOS
     }
 
-    // manera de captar input de widget
+    // manera de captar input |de widget
     // Declarar funcion que reciba un view como argumento
     fun boton2(view: View?){
 
@@ -73,6 +106,13 @@ class MainActivity : AppCompatActivity() {
         // 1 - con tipo explícito
         // 2 - con una acción
         val intent = Intent(this, SecondActivity::class.java)
-        startActivity(intent)
+
+        // como mandar datos hacia la nueva actividad
+        intent.putExtra("nombre", textoEditable.text.toString())
+        intent.putExtra("edad", 20.3f)
+        intent.putExtra("calificacion", 40)
+
+        //startActivity(intent)
+        lanzador.launch(intent)
     }
 }
