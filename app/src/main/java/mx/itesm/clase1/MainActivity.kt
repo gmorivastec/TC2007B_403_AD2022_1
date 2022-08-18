@@ -115,4 +115,9 @@ class MainActivity : AppCompatActivity() {
         //startActivity(intent)
         lanzador.launch(intent)
     }
+
+    fun irADb(view : View?){
+        val intent = Intent(this, DBActivity::class.java)
+        startActivity(intent)
+    }
 }
